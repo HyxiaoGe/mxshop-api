@@ -2,6 +2,6 @@ package api
 
 import "github.com/gin-gonic/gin"
 
-func getUserList(context *gin.Context) {
+func GetUserList(context *gin.Context) {
 
 }
