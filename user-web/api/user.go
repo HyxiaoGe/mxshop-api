@@ -72,7 +72,6 @@ func GetUserList(context *gin.Context) {
 
 	result := make([]interface{}, 0)
 	for _, value := range rsp.Data {
-		//data := make(map[string]interface{}, 0)
 
 		user := response.UserResponse{
 			Id:       value.Id,
@@ -81,12 +80,6 @@ func GetUserList(context *gin.Context) {
 			Gender:   value.Gender,
 			Mobile:   value.Mobile,
 		}
-
-		//data["id"] = value.Id
-		//data["name"] = value.NickName
-		//data["birthday"] = value.BirthDay
-		//data["gender"] = value.Gender
-		//data["mobile"] = value.Mobile
 
 		result = append(result, user)
 	}
