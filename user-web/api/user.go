@@ -3,6 +3,7 @@ package api
 import (
 	context1 "context"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
@@ -12,6 +13,8 @@ import (
 	"mxshop-api/user-web/forms"
 	"mxshop-api/user-web/global"
 	"mxshop-api/user-web/global/response"
+	"mxshop-api/user-web/middlewares"
+	"mxshop-api/user-web/models"
 	"mxshop-api/user-web/proto"
 	"net/http"
 	"strconv"
@@ -165,7 +168,27 @@ func PassWordLogin(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"msg": "登录失败"})
 		} else {
 			if pasRsp.Success {
-				ctx.JSON(http.StatusOK, gin.H{"msg": "登录成功"})
+				j := middlewares.NewJWT()
+				claim := models.CustomClaims{
+					ID:          uint(rsp.Id),
+					NickName:    rsp.NickName,
+					AuthorityId: uint(rsp.Role),
+					StandardClaims: jwt.StandardClaims{
+						NotBefore: time.Now().Unix(), // 签名生效时间
+						ExpiresAt: time.Now().Unix() + 60*60*24*30,
+						Issuer:    "goShop",
+					},
+				}
+				token, err := j.CreateToken(claim)
+				if err != nil {
+					ctx.JSON(http.StatusInternalServerError, gin.H{"msg": "获取token失败"})
+				}
+				ctx.JSON(http.StatusOK, gin.H{
+					"id":         rsp.Id,
+					"nick_name":  rsp.NickName,
+					"token":      token,
+					"expired_at": (time.Now().Unix() + 60*60*24*30) * 1000,
+				})
 			} else {
 				ctx.JSON(http.StatusBadRequest, gin.H{"msg": "登录失败"})
 			}
