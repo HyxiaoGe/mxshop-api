@@ -84,6 +84,10 @@ func GetUserList(context *gin.Context) {
 		zap.S().Errorw("[getUserList] 连接用户服务失败", "msg", err.Error())
 	}
 
+	claims, _ := context.Get("claims")
+	currentUser := claims.(*models.CustomClaims)
+
+	zap.S().Infow("访问用户：%d", currentUser.ID)
 	//	生成grpc的client并调用接口
 	userSrvClient := proto.NewUserClient(userConn)
 
